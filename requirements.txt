@@ -6,3 +6,9 @@ tensorflow
 imbalanced-learn
 joblib
 watchdog
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+bcrypt
+sqlalchemy
+python-multipart

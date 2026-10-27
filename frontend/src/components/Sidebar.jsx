@@ -15,7 +15,7 @@ function Sidebar() {
     <aside className="sidebar">
       {/* TOP SECTION - Scrollable */}
       <div className="sidebar-top">
-        <h2 className="logo">CyberSIEM</h2>
+        <h2 className="logo">SentraX</h2>
         <ul>
           <li><Link to="/">Dashboard</Link></li>
           <li className="divider"></li>

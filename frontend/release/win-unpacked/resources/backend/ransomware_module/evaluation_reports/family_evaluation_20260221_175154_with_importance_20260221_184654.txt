@@ -1,0 +1,73 @@
+======================================================================
+COMPREHENSIVE CROSS-FAMILY RANSOMWARE DETECTION EVALUATION
+======================================================================
+
+Timestamp: 2026-02-21 17:51:54
+
+SECTION 1: LEAVE-ONE-FAMILY-OUT EVALUATION
+----------------------------------------------------------------------
+       Train Families Test Family ROC AUC Recall Precision     F1
+ lockbit, revil, ryuk       conti  0.9975 0.9953    0.9961 0.9957
+   conti, revil, ryuk     lockbit  0.9976 0.9951    0.9927 0.9939
+ conti, lockbit, ryuk       revil  0.9974 0.9869    0.9821 0.9845
+conti, lockbit, revil        ryuk  0.9942 0.9599    0.9746 0.9672
+
+SECTION 2: PERFORMANCE STABILITY ANALYSIS
+----------------------------------------------------------------------
+ROC AUC (mean ± std):  0.9967 ± 0.0014
+Recall (mean ± std):   0.9843 ± 0.0145
+F1 Score (mean ± std): 0.9853 ± 0.0113
+
+Coefficient of Variation:
+  ROC AUC:  0.14%
+  Recall:   1.47%
+  F1 Score: 1.15%
+
+Stability Assessment: STABLE
+(Threshold: CV < 15.0%)
+
+
+
+======================================================================
+KEY FINDINGS AND INTERPRETATION
+======================================================================
+
+
+✅ STRONG GENERALIZATION DETECTED
+
+The model demonstrates:
+  • Consistent performance across all ransomware families (CV < 15%)
+  • High recall (>90%) even when family is held out during training
+  • Universal detection of encryption burst behavior
+  
+CONCLUSION:
+The model is learning BEHAVIORAL PATTERNS inherent to ransomware encryption,
+not family-specific signatures. A new, unseen ransomware family with similar
+encryption behavior would likely be detected effectively.
+
+CONFIDENCE: HIGH
+Recommendation: Deploy as general-purpose ransomware detector
+
+----------------------------------------------------------------------
+NUMERICAL SUMMARY
+----------------------------------------------------------------------
+Number of experiments: 4
+Training families per fold: 3 (out of 4)
+Test family per fold: 1 (held-out)
+Total benign samples: 35870
+  - Training: 28696
+  - Testing: 7174
+
+PERFORMANCE RANGE
+  ROC AUC:  0.9942 - 0.9976
+  Recall:   0.9599 - 0.9953
+  F1 Score: 0.9672 - 0.9957
+
+
+
+SECTION: SURROGATE FEATURE IMPORTANCE (RandomForest per LOFO)
+------------------------------------------------------------
+Held-out: conti — Top5: total_disk_writes, disk_write_delta_mean, ata_variance, mem_write_delta_mean, mem_entropy_avg
+Held-out: lockbit — Top5: mem_write_delta_mean, total_disk_writes, disk_write_delta_mean, ata_variance, mem_entropy_avg
+Held-out: revil — Top5: mem_write_delta_mean, total_disk_writes, disk_write_delta_mean, ata_variance, mem_entropy_avg
+Held-out: ryuk — Top5: mem_write_delta_mean, total_disk_writes, disk_write_delta_mean, ata_variance, mem_entropy_avg

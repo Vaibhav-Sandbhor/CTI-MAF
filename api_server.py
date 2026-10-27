@@ -1,3 +1,19 @@
+# ---------------------------------------------------------------------------
+# Safe UTF-8 encoding for Windows compatibility (Electron subprocess)
+# Must be at the very top before any print/logging
+# ---------------------------------------------------------------------------
+import sys
+import io
+
+# Force UTF-8 encoding to prevent UnicodeEncodeError on Windows
+if sys.stdout and hasattr(sys.stdout, 'buffer'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'buffer'):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+# ---------------------------------------------------------------------------
+# Standard imports
+# ---------------------------------------------------------------------------
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,7 +22,6 @@ import numpy as np
 import os
 import pandas as pd
 import csv
-import sys
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
@@ -36,7 +51,7 @@ try:
     ENABLE_DB = True
 except ImportError as e:
     logger = logging.getLogger(__name__)
-    logger.warning(f"⚠️  Database module not available: {e}. Running without persistence.")
+    logger.warning(f"[WARN] Database module not available: {e}. Running without persistence.")
     ENABLE_DB = False
 
 # Global session ID (will be set on startup)
@@ -89,14 +104,14 @@ def run_migrations():
     # Check and add role column
     try:
         cursor.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'Analyst'")
-        logger.info("✅ Added 'role' column to users table")
+        logger.info("[OK] Added 'role' column to users table")
     except sqlite3.OperationalError:
         pass  # Column already exists
     
     # Check and add last_login column
     try:
         cursor.execute("ALTER TABLE users ADD COLUMN last_login TIMESTAMP")
-        logger.info("✅ Added 'last_login' column to users table")
+        logger.info("[OK] Added 'last_login' column to users table")
     except sqlite3.OperationalError:
         pass  # Column already exists
     
@@ -262,6 +277,9 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "file://",  # Electron production mode
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -280,11 +298,39 @@ async def startup_event():
         try:
             init_database()
             CURRENT_SESSION_ID = start_session()
-            logger.info(f"✅ Database initialized with session ID: {CURRENT_SESSION_ID}")
+            logger.info(f"[OK] Database initialized with session ID: {CURRENT_SESSION_ID}")
         except Exception as e:
-            logger.error(f"❌ Failed to initialize database: {e}")
+            logger.error(f"[ERROR] Failed to initialize database: {e}")
     else:
-        logger.warning("⚠️  Database is disabled, running without persistence")
+        logger.warning("[WARN] Database is disabled, running without persistence")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Health Check Endpoint (for Electron backend detection)
+# ─────────────────────────────────────────────────────────────────────────────
+@app.get("/health", tags=["Health"])
+def health_check():
+    """Simple health check endpoint for Electron to verify backend is running."""
+    return {
+        "status": "healthy",
+        "service": "CyberSIEM API",
+        "database": "connected" if ENABLE_DB else "disabled",
+        "session_id": CURRENT_SESSION_ID,
+    }
+
+
+@app.get("/api/debug/routes", tags=["Debug"])
+def list_routes():
+    """List all registered API routes (for debugging)."""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, "path") and hasattr(route, "methods"):
+            routes.append({
+                "path": route.path,
+                "methods": list(route.methods) if route.methods else [],
+            })
+    return {"routes": sorted(routes, key=lambda x: x["path"])}
+
 
 MODEL_PATH = os.path.join("ransomware_module", "models", "rf_model.joblib")
 model = joblib.load(MODEL_PATH)
@@ -435,7 +481,7 @@ def update_profile(
     db.commit()
     db.refresh(user)
     
-    logger.info(f"✅ Profile updated for user: {user.email}")
+    logger.info(f"[OK] Profile updated for user: {user.email}")
     return UserResponse.from_orm(user)
 
 
@@ -471,7 +517,7 @@ def change_password(
     user.password = PasswordManager.hash_password(password_data.new_password)
     db.commit()
     
-    logger.info(f"✅ Password changed for user: {user.email}")
+    logger.info(f"[OK] Password changed for user: {user.email}")
     return {"message": "Password changed successfully"}
 
 
@@ -490,7 +536,7 @@ def get_metrics(current_user: dict = Depends(get_current_user)):
         metrics = get_metrics_for_session(CURRENT_SESSION_ID)
         return {"metrics": metrics, "session_id": CURRENT_SESSION_ID}
     except Exception as e:
-        logger.error(f"❌ Error fetching metrics: {e}")
+        logger.error(f"[ERROR] Error fetching metrics: {e}")
         return {"error": str(e)}
 
 
@@ -513,7 +559,7 @@ def get_events(current_user: dict = Depends(get_current_user)):
         events = [dict(row) for row in results]
         return {"events": events, "total": len(events)}
     except Exception as e:
-        logger.error(f"❌ Error fetching events: {e}")
+        logger.error(f"[ERROR] Error fetching events: {e}")
         return {"error": str(e)}
 
 
@@ -539,7 +585,7 @@ def get_events_by_date(date: str, current_user: dict = Depends(get_current_user)
         events = [dict(row) for row in results]
         return {"date": date, "events": events, "total": len(events)}
     except Exception as e:
-        logger.error(f"❌ Error fetching events by date: {e}")
+        logger.error(f"[ERROR] Error fetching events by date: {e}")
         return {"error": str(e)}
 
 
@@ -554,7 +600,7 @@ def get_metrics_summary(current_user: dict = Depends(get_current_user)):
         summary = get_metrics_summary(CURRENT_SESSION_ID)
         return summary or {"error": "No data available"}
     except Exception as e:
-        logger.error(f"❌ Error fetching metrics summary: {e}")
+        logger.error(f"[ERROR] Error fetching metrics summary: {e}")
         return {"error": str(e)}
 
 
@@ -606,7 +652,7 @@ def get_history_dates(current_user: dict = Depends(get_current_user)):
         logger.info(f"📅 Found {len(dates)} available history dates")
         return {"dates": dates, "total": len(dates)}
     except Exception as e:
-        logger.error(f"❌ Error fetching history dates: {e}")
+        logger.error(f"[ERROR] Error fetching history dates: {e}")
         return {"error": str(e)}
 
 
@@ -669,7 +715,7 @@ def get_history_metrics(date: str, current_user: dict = Depends(get_current_user
                 "last_recorded": row['last_recorded'],
             }
 
-        logger.info(f"📊 Retrieved {len(metrics)} metrics for date {date}")
+        logger.info(f"[STATS] Retrieved {len(metrics)} metrics for date {date}")
         return {
             "date": date,
             "metrics": metrics,
@@ -677,7 +723,7 @@ def get_history_metrics(date: str, current_user: dict = Depends(get_current_user
             "total": len(metrics)
         }
     except Exception as e:
-        logger.error(f"❌ Error fetching history metrics: {e}")
+        logger.error(f"[ERROR] Error fetching history metrics: {e}")
         return {"error": str(e)}
 
 
@@ -725,7 +771,7 @@ def get_history_events(date: str, current_user: dict = Depends(get_current_user)
             "LOW": sum(1 for e in events if e["severity"] == "LOW"),
         }
 
-        logger.info(f"📝 Retrieved {len(events)} events for date {date}")
+        logger.info(f"[LOG] Retrieved {len(events)} events for date {date}")
         return {
             "date": date,
             "events": events,
@@ -733,7 +779,7 @@ def get_history_events(date: str, current_user: dict = Depends(get_current_user)
             "total": len(events)
         }
     except Exception as e:
-        logger.error(f"❌ Error fetching history events: {e}")
+        logger.error(f"[ERROR] Error fetching history events: {e}")
         return {"error": str(e)}
 
 
@@ -758,7 +804,7 @@ def health_check_history(current_user: dict = Depends(get_current_user)):
             "database": "cybersiem_data.db"
         }
     except Exception as e:
-        logger.error(f"❌ Error checking history health: {e}")
+        logger.error(f"[ERROR] Error checking history health: {e}")
         return {"status": "error", "message": str(e)}
 
 
@@ -793,15 +839,15 @@ def start_user_session_endpoint(current_user: dict = Depends(get_current_user), 
         # Check if user already has an active session
         existing_session = get_active_session_for_user(user.id)
         if existing_session:
-            logger.info(f"♻️ User {user.id} already has active session: {existing_session}")
+            logger.info(f"[REUSE] User {user.id} already has active session: {existing_session}")
             return {"session_id": existing_session, "status": "existing"}
 
         # Start new session
         session_id = start_user_session(user.id)
-        logger.info(f"✅ Started new session {session_id} for user {user.id}")
+        logger.info(f"[OK] Started new session {session_id} for user {user.id}")
         return {"session_id": session_id, "status": "created"}
     except Exception as e:
-        logger.error(f"❌ Error starting session: {e}")
+        logger.error(f"[ERROR] Error starting session: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -837,10 +883,10 @@ def end_user_session_endpoint(
         }
 
         end_user_session(session_id, snapshot_dict)
-        logger.info(f"✅ Ended session {session_id} with final snapshot for user {user.id}")
+        logger.info(f"[OK] Ended session {session_id} with final snapshot for user {user.id}")
         return {"session_id": session_id, "status": "ended"}
     except Exception as e:
-        logger.error(f"❌ Error ending session: {e}")
+        logger.error(f"[ERROR] Error ending session: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -888,7 +934,7 @@ def save_timeline_snapshot_endpoint(
         }
 
         snapshot_id = save_timeline_snapshot(session_id, snapshot_dict)
-        logger.info(f"✅ Saved timeline snapshot {snapshot_id} for session {session_id}")
+        logger.info(f"[OK] Saved timeline snapshot {snapshot_id} for session {session_id}")
         return {
             "snapshot_id": snapshot_id,
             "session_id": session_id,
@@ -897,7 +943,7 @@ def save_timeline_snapshot_endpoint(
             "max": MAX_TIMELINE_SNAPSHOTS
         }
     except Exception as e:
-        logger.error(f"❌ Error saving timeline snapshot: {e}")
+        logger.error(f"[ERROR] Error saving timeline snapshot: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -927,7 +973,7 @@ def get_user_sessions_endpoint(
             "user_id": user.id
         }
     except Exception as e:
-        logger.error(f"❌ Error fetching user sessions: {e}")
+        logger.error(f"[ERROR] Error fetching user sessions: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -959,7 +1005,7 @@ def get_session_detail_endpoint(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error fetching session detail: {e}")
+        logger.error(f"[ERROR] Error fetching session detail: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -1104,7 +1150,7 @@ def run_ransomware_pipeline(current_user: dict = Depends(get_current_user)):
                         f"Detected {summary['ransomware']} ransomware threat(s) in pipeline"
                     )
             except Exception as e:
-                logger.warning(f"⚠️  Failed to log ransomware event: {e}")
+                logger.warning(f"[WARN] Failed to log ransomware event: {e}")
 
         return {"status": "ok", "message": "Pipeline completed successfully", "summary": summary}
 
@@ -1791,7 +1837,7 @@ def get_honeypot_log(current_user: dict = Depends(get_current_user)):
                     f"Detected {critical_count} critical honeypot interaction(s)"
                 )
         except Exception as e:
-            logger.warning(f"⚠️  Failed to log honeypot event: {e}")
+            logger.warning(f"[WARN] Failed to log honeypot event: {e}")
 
     return {"events": rows, "summary": summary}
 
@@ -1800,9 +1846,48 @@ def get_honeypot_log(current_user: dict = Depends(get_current_user)):
 # Port scan — localhost auto-scan endpoint
 # ---------------------------------------------------------------------------
 
-_NMAP_EXE = r"C:\Program Files (x86)\Nmap\nmap.exe"
-if not os.path.exists(_NMAP_EXE):
-    _NMAP_EXE = "nmap"
+def inferLocalOS() -> str:
+    """Infer local operating system for scan results."""
+    import platform
+    system = platform.system()
+    if system == "Windows":
+        return f"Windows {platform.release()} (Local Host)"
+    elif system == "Darwin":
+        return "macOS (Local Host)"
+    elif system == "Linux":
+        return f"Linux {platform.release()} (Local Host)"
+    return f"{system} (Local Host)"
+
+def _find_nmap_executable() -> str:
+    """Find Nmap executable with multiple fallback paths."""
+    # Common Windows Nmap installation paths
+    nmap_paths = [
+        r"C:\Program Files (x86)\Nmap\nmap.exe",
+        r"C:\Program Files\Nmap\nmap.exe",
+        r"C:\Nmap\nmap.exe",
+        os.path.expandvars(r"%LOCALAPPDATA%\Programs\Nmap\nmap.exe"),
+        os.path.expandvars(r"%ProgramFiles(x86)%\Nmap\nmap.exe"),
+        os.path.expandvars(r"%ProgramFiles%\Nmap\nmap.exe"),
+    ]
+    
+    # Check each path
+    for nmap_path in nmap_paths:
+        if os.path.exists(nmap_path):
+            logger.info(f"[NMAP] Found Nmap at: {nmap_path}")
+            return nmap_path
+    
+    # Try to find nmap in PATH
+    import shutil
+    nmap_in_path = shutil.which("nmap")
+    if nmap_in_path:
+        logger.info(f"[NMAP] Found Nmap in PATH: {nmap_in_path}")
+        return nmap_in_path
+    
+    # Fallback to "nmap" command (will fail if not in PATH)
+    logger.warning("[NMAP] Nmap not found in standard locations, using 'nmap' command")
+    return "nmap"
+
+_NMAP_EXE = _find_nmap_executable()
 
 # Quick risk lookup by port number
 _PORT_RISK = {
@@ -1853,25 +1938,49 @@ def _nmap_parse(xml_path: str) -> list:
 @app.post("/api/portscan/scan")
 def portscan_localhost(current_user: dict = Depends(get_current_user)):
     """Run Nmap on localhost and return open ports with AI risk levels."""
+    logger.info(f"[PORTSCAN] Starting scan with Nmap: {_NMAP_EXE}")
+    
+    # Verify Nmap exists before attempting scan
+    if not os.path.exists(_NMAP_EXE) and _NMAP_EXE != "nmap":
+        logger.error(f"[PORTSCAN] Nmap executable not found: {_NMAP_EXE}")
+        return {
+            "status": "error",
+            "message": f"Nmap not found at: {_NMAP_EXE}. Please install Nmap.",
+            "ports": [],
+            "nmap_path": _NMAP_EXE,
+        }
+    
     with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as tmp:
         xml_path = tmp.name
 
     try:
+        logger.info(f"[PORTSCAN] Running: {_NMAP_EXE} -sV --open -T4 -oX {xml_path} 127.0.0.1")
         proc = subprocess.run(
             [_NMAP_EXE, "-sV", "--open", "-T4", "-oX", xml_path, "127.0.0.1"],
             capture_output=True, text=True, timeout=120
         )
+        
+        logger.info(f"[PORTSCAN] Nmap exit code: {proc.returncode}")
+        if proc.stdout:
+            logger.info(f"[PORTSCAN] stdout: {proc.stdout[:500]}")
+        if proc.stderr:
+            logger.warning(f"[PORTSCAN] stderr: {proc.stderr[:500]}")
+        
         if proc.returncode != 0:
             return {
                 "status": "error",
                 "message": f"Nmap failed: {proc.stderr.strip() or 'non-zero exit'}",
                 "ports": [],
+                "nmap_path": _NMAP_EXE,
             }
 
         ports = _nmap_parse(xml_path)
+        logger.info(f"[PORTSCAN] Found {len(ports)} open ports")
+        
         high   = sum(1 for p in ports if p["risk"] == "HIGH")
         medium = sum(1 for p in ports if p["risk"] == "MEDIUM")
         low    = sum(1 for p in ports if p["risk"] == "LOW")
+        critical = sum(1 for p in ports if p["risk"] == "CRITICAL")
 
         # ── Log to database ────────────────────────────────────────────
         if ENABLE_DB and CURRENT_SESSION_ID is not None:
@@ -1885,28 +1994,131 @@ def portscan_localhost(current_user: dict = Depends(get_current_user)):
                         f"Service: {port.get('service', 'unknown')}"
                     )
             except Exception as e:
-                logger.warning(f"⚠️  Failed to log port events: {e}")
+                logger.warning(f"[WARN] Failed to log port events: {e}")
+
+        # Calculate security score (higher = safer)
+        total_ports = len(ports)
+        risk_penalty = (critical * 25) + (high * 15) + (medium * 5) + (low * 1)
+        security_score = max(0, min(100, 100 - risk_penalty))
+        
+        # Determine risk tier
+        if critical > 0 or high >= 3:
+            risk_tier = "Critical"
+            final_risk = "CRITICAL"
+        elif high > 0:
+            risk_tier = "High"
+            final_risk = "HIGH"
+        elif medium > 0:
+            risk_tier = "Medium"
+            final_risk = "MEDIUM"
+        else:
+            risk_tier = "Low"
+            final_risk = "LOW"
+
+        # Build response in format expected by frontend
+        scan_time = datetime.now(timezone.utc).isoformat()
+        
+        # Extract just port numbers for open_ports array
+        open_port_numbers = [p["port"] for p in ports]
+        
+        # Build port analysis for report section
+        port_analysis = []
+        for p in ports:
+            port_analysis.append({
+                "port": p["port"],
+                "service": p["service"],
+                "service_name": p["service"],
+                "risk": p["risk"],
+                "risk_level": p["risk"],
+                "cvss_score": 7.5 if p["risk"] == "HIGH" else 5.0 if p["risk"] == "MEDIUM" else 2.0,
+                "exploitability": "High" if p["risk"] == "HIGH" else "Medium" if p["risk"] == "MEDIUM" else "Low",
+                "mitigation_priority": p["risk"],
+            })
 
         return {
-            "status":     "success",
-            "host":       "127.0.0.1",
-            "scan_time":  datetime.now(timezone.utc).isoformat(),
-            "total":      len(ports),
-            "high":       high,
-            "medium":     medium,
-            "low":        low,
-            "ports":      ports,
+            "status": "success",
+            "timestamp": scan_time,
+            "dashboard": [{
+                "host": "127.0.0.1",
+                "operating_system": inferLocalOS(),
+                "total_ports": total_ports,
+                "open_ports": open_port_numbers,
+                "critical_port_count": critical,
+                "high_port_count": high,
+                "medium_port_count": medium,
+                "low_port_count": low,
+                "security_score": security_score,
+                "risk_tier": risk_tier,
+                "final_risk": final_risk,
+            }],
+            "report": [{
+                "host": "127.0.0.1",
+                "port_analysis": port_analysis,
+            }],
+            # Also include flat format for backwards compatibility
+            "host": "127.0.0.1",
+            "scan_time": scan_time,
+            "total": total_ports,
+            "high": high,
+            "medium": medium,
+            "low": low,
+            "ports": ports,
         }
 
     except subprocess.TimeoutExpired:
         return {"status": "error", "message": "Nmap timed out after 120 s.", "ports": []}
     except Exception as e:
+        logger.error(f"[PORTSCAN] Exception: {e}")
         return {"status": "error", "message": str(e), "ports": []}
     finally:
         try:
             os.remove(xml_path)
         except Exception:
             pass
+
+
+@app.get("/api/portscan/status")
+def portscan_status():
+    """Check Nmap installation status (no auth required for diagnostics)."""
+    logger.info("[PORTSCAN] Checking Nmap status...")
+    
+    # Try multiple paths
+    possible_paths = [
+        r"C:\Program Files (x86)\Nmap\nmap.exe",
+        r"C:\Program Files\Nmap\nmap.exe",
+        r"C:\Nmap\nmap.exe",
+        "nmap",
+    ]
+    
+    for nmap_path in possible_paths:
+        try:
+            proc = subprocess.run(
+                [nmap_path, "--version"],
+                capture_output=True, text=True, timeout=10
+            )
+            if proc.returncode == 0:
+                version = proc.stdout.split("\n")[0] if proc.stdout else "unknown"
+                logger.info(f"[PORTSCAN] Nmap found at: {nmap_path}, version: {version}")
+                return {
+                    "nmap_installed": True,
+                    "nmap_path": nmap_path,
+                    "nmap_version": version,
+                    "status": "ready",
+                }
+        except FileNotFoundError:
+            continue
+        except Exception as e:
+            logger.warning(f"[PORTSCAN] Error checking {nmap_path}: {e}")
+            continue
+    
+    logger.warning("[PORTSCAN] Nmap not found in any standard location")
+    return {
+        "nmap_installed": False,
+        "nmap_path": None,
+        "nmap_version": None,
+        "status": "not_found",
+        "error": "Nmap not found. Please install from https://nmap.org/download.html",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -1971,3 +2183,14 @@ def get_security_metrics(current_user: dict = Depends(get_current_user)):
             "total": 0,
             "error": str(e)
         }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Server Startup
+# ─────────────────────────────────────────────────────────────────────────────
+# Server Startup - DISABLED - Backend is started by start_server.py (Electron)
+# ─────────────────────────────────────────────────────────────────────────────
+# if __name__ == "__main__":
+#     import uvicorn
+#     print("[DISABLED] Direct uvicorn startup removed to prevent port conflicts")
+#     print("[INFO] Use start_server.py instead when running with Electron")

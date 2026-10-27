@@ -1,0 +1,253 @@
+{
+  "timestamp": "2026-02-21T17:51:54.968961",
+  "lofo_results": [
+    {
+      "held_out_family": "conti",
+      "train_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9975063426414551,
+      "precision": 0.9960748972174224,
+      "recall": 0.9952669062981403,
+      "f1": 0.9956707378358156,
+      "confusion_matrix": [
+        [
+          6647,
+          527
+        ],
+        [
+          636,
+          133737
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "lockbit",
+      "train_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9976317976985684,
+      "precision": 0.9927415676067298,
+      "recall": 0.9950913149896446,
+      "f1": 0.9939150525212906,
+      "confusion_matrix": [
+        [
+          6633,
+          541
+        ],
+        [
+          365,
+          73993
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "revil",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9974139023138441,
+      "precision": 0.9821389556478043,
+      "recall": 0.9869367144190131,
+      "f1": 0.9845319900347688,
+      "confusion_matrix": [
+        [
+          6847,
+          327
+        ],
+        [
+          238,
+          17981
+        ]
+      ],
+      "optimal_threshold": 0.32
+    },
+    {
+      "held_out_family": "ryuk",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.9942330168381052,
+      "precision": 0.974579745797458,
+      "recall": 0.9599192327107522,
+      "f1": 0.9671939372361528,
+      "confusion_matrix": [
+        [
+          6926,
+          248
+        ],
+        [
+          397,
+          9508
+        ]
+      ],
+      "optimal_threshold": 0.47
+    }
+  ],
+  "single_family_results": [
+    {
+      "train_family": "conti",
+      "test_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9969046174190036,
+      "precision": 0.9946043165467626,
+      "recall": 0.9927799242867736,
+      "f1": 0.9936912830328717,
+      "confusion_matrix": [
+        [
+          6622,
+          552
+        ],
+        [
+          740,
+          101752
+        ]
+      ]
+    },
+    {
+      "train_family": "lockbit",
+      "test_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9935080315787098,
+      "precision": 0.9976560247684227,
+      "recall": 0.9795516500827657,
+      "f1": 0.9885209507397575,
+      "confusion_matrix": [
+        [
+          6800,
+          374
+        ],
+        [
+          3323,
+          159184
+        ]
+      ]
+    },
+    {
+      "train_family": "revil",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9862419225957106,
+      "precision": 0.9971166423204346,
+      "recall": 0.9553067515527383,
+      "f1": 0.9757640309816782,
+      "confusion_matrix": [
+        [
+          6570,
+          604
+        ],
+        [
+          9772,
+          208874
+        ]
+      ]
+    },
+    {
+      "train_family": "ryuk",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.9749549858721017,
+      "precision": 0.9965347094052507,
+      "recall": 0.9325696157913289,
+      "f1": 0.963491687758335,
+      "confusion_matrix": [
+        [
+          6438,
+          736
+        ],
+        [
+          15304,
+          211656
+        ]
+      ]
+    }
+  ],
+  "stability_metrics": {
+    "roc_auc_mean": 0.9966962648729931,
+    "roc_auc_std": 0.001424257880141059,
+    "roc_auc_cv": 0.14289788477561408,
+    "recall_mean": 0.9843035421043875,
+    "recall_std": 0.01447497443272174,
+    "recall_cv": 1.4705803457513758,
+    "f1_mean": 0.985327929407007,
+    "f1_std": 0.011293665936176133,
+    "f1_cv": 1.1461834785270848
+  },
+  "feature_importance": [],
+  "surrogate_feature_importance": [
+    {
+      "held_out_family": "conti",
+      "top1": "total_disk_writes",
+      "top1_imp": 0.0585359036156524,
+      "top2": "disk_write_delta_mean",
+      "top2_imp": 0.0570209991741415,
+      "top3": "ata_variance",
+      "top3_imp": 0.0380438228780187,
+      "top4": "mem_write_delta_mean",
+      "top4_imp": 0.0273218053770045,
+      "top5": "mem_entropy_avg",
+      "top5_imp": 0.0081200623353918
+    },
+    {
+      "held_out_family": "lockbit",
+      "top1": "mem_write_delta_mean",
+      "top1_imp": 0.0592515627408181,
+      "top2": "total_disk_writes",
+      "top2_imp": 0.0494265607648344,
+      "top3": "disk_write_delta_mean",
+      "top3_imp": 0.0380035067112142,
+      "top4": "ata_variance",
+      "top4_imp": 0.0254754054966949,
+      "top5": "mem_entropy_avg",
+      "top5_imp": 0.0133008781389434
+    },
+    {
+      "held_out_family": "revil",
+      "top1": "mem_write_delta_mean",
+      "top1_imp": 0.0679401392633142,
+      "top2": "total_disk_writes",
+      "top2_imp": 0.040045564496991,
+      "top3": "disk_write_delta_mean",
+      "top3_imp": 0.0350400281420811,
+      "top4": "ata_variance",
+      "top4_imp": 0.0312491112629401,
+      "top5": "mem_entropy_avg",
+      "top5_imp": 0.0141190371596232
+    },
+    {
+      "held_out_family": "ryuk",
+      "top1": "mem_write_delta_mean",
+      "top1_imp": 0.0595596385947816,
+      "top2": "total_disk_writes",
+      "top2_imp": 0.0459118607070384,
+      "top3": "disk_write_delta_mean",
+      "top3_imp": 0.0389365983480193,
+      "top4": "ata_variance",
+      "top4_imp": 0.0301417720408512,
+      "top5": "mem_entropy_avg",
+      "top5_imp": 0.0135814165468567
+    }
+  ]
+}

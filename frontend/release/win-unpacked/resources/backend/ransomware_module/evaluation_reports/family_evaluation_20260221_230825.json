@@ -1,0 +1,199 @@
+{
+  "timestamp": "2026-02-21T23:08:25.361384",
+  "lofo_results": [
+    {
+      "held_out_family": "conti",
+      "train_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9985561101927654,
+      "precision": 0.9966342001012719,
+      "recall": 0.9959222549632407,
+      "f1": 0.9962781003424148,
+      "confusion_matrix": [
+        [
+          6723,
+          452
+        ],
+        [
+          548,
+          133840
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "lockbit",
+      "train_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9976884734411604,
+      "precision": 0.9946979585794835,
+      "recall": 0.993681691693441,
+      "f1": 0.9941895654279143,
+      "confusion_matrix": [
+        [
+          6781,
+          394
+        ],
+        [
+          470,
+          73917
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "revil",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9979420348103184,
+      "precision": 0.9900170977883184,
+      "recall": 0.985018932118751,
+      "f1": 0.9875116905980085,
+      "confusion_matrix": [
+        [
+          6994,
+          181
+        ],
+        [
+          273,
+          17950
+        ]
+      ],
+      "optimal_threshold": 0.23
+    },
+    {
+      "held_out_family": "ryuk",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.9962352742627902,
+      "precision": 0.9734326255409077,
+      "recall": 0.9760847628657922,
+      "f1": 0.9747568902101074,
+      "confusion_matrix": [
+        [
+          6911,
+          264
+        ],
+        [
+          237,
+          9673
+        ]
+      ],
+      "optimal_threshold": 0.17
+    }
+  ],
+  "single_family_results": [
+    {
+      "train_family": "conti",
+      "test_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9972869658952542,
+      "precision": 0.9965212606008196,
+      "recall": 0.9890471081634643,
+      "f1": 0.9927701171368293,
+      "confusion_matrix": [
+        [
+          6821,
+          354
+        ],
+        [
+          1123,
+          101407
+        ]
+      ]
+    },
+    {
+      "train_family": "lockbit",
+      "test_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9937419805435348,
+      "precision": 0.9979578375910094,
+      "recall": 0.968147614916539,
+      "f1": 0.9828267339564719,
+      "confusion_matrix": [
+        [
+          6853,
+          322
+        ],
+        [
+          5177,
+          157354
+        ]
+      ]
+    },
+    {
+      "train_family": "revil",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9897011252923881,
+      "precision": 0.9984910345486235,
+      "recall": 0.9561215391298383,
+      "f1": 0.976847072014202,
+      "confusion_matrix": [
+        [
+          6859,
+          316
+        ],
+        [
+          9596,
+          209099
+        ]
+      ]
+    },
+    {
+      "train_family": "ryuk",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.9806995581484672,
+      "precision": 0.9969718329453446,
+      "recall": 0.9470547293487455,
+      "f1": 0.9713724161301254,
+      "confusion_matrix": [
+        [
+          6522,
+          653
+        ],
+        [
+          12019,
+          214989
+        ]
+      ]
+    }
+  ],
+  "stability_metrics": {
+    "roc_auc_mean": 0.9976054731767586,
+    "roc_auc_std": 0.0008516628700838025,
+    "roc_auc_cv": 0.08537070946210641,
+    "recall_mean": 0.9876769104103063,
+    "recall_std": 0.007833993846484923,
+    "recall_cv": 0.793173735653138,
+    "f1_mean": 0.9881840616446111,
+    "f1_std": 0.008401198630086591,
+    "f1_cv": 0.8501653645480455
+  },
+  "feature_importance": []
+}

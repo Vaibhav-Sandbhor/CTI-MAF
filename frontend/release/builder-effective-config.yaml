@@ -1,0 +1,52 @@
+directories:
+  output: release
+  buildResources: public
+appId: com.sentrax.app
+productName: SentraX
+asar: true
+files:
+  - filter:
+      - dist/**/*
+      - electron/**/*
+      - '!node_modules/**/*'
+extraResources:
+  - from: ../
+    to: backend
+    filter:
+      - api_server.py
+      - orchestrator.py
+      - requirements.txt
+      - database/**/*
+      - auth/**/*
+      - ransomware_module/**/*
+      - honeypot/**/*
+      - portscan_module/**/*
+      - '!**/__pycache__/**'
+      - '!**/venv/**'
+      - '!**/*.pyc'
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+  icon: public/icon.png
+  maintainer: CyberSIEM Team
+win:
+  target:
+    - nsis
+    - portable
+  icon: public/icons/icon.ico
+  sign: false
+  signAndEditExecutable: false
+mac:
+  target:
+    - dmg
+    - zip
+  icon: public/icon.icns
+  category: public.app-category.utilities
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+electronVersion: 31.0.0

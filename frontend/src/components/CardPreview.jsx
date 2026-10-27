@@ -14,14 +14,24 @@ const CardPreview = ({ module, data, color }) => {
           ],
         };
       case "portscan":
-        const openPorts = data.scanData?.dashboard?.[0]?.open_ports ?? [];
-        const criticalPorts = Array.isArray(openPorts) ? openPorts.filter(p => p.risk === "CRITICAL").length : 0;
-        const highRiskPorts = Array.isArray(openPorts) ? openPorts.filter(p => p.risk === "HIGH").length : 0;
+        // Get port analysis from report for accurate risk counts
+        const portAnalysis = data.scanData?.report?.[0]?.port_analysis ?? [];
+        const dashboard = data.scanData?.dashboard?.[0] ?? {};
+        
+        // Count from port_analysis (has risk info) OR use dashboard counts
+        const criticalPorts = dashboard.critical_port_count ?? 
+          portAnalysis.filter(p => p.risk === "CRITICAL" || p.risk_level === "CRITICAL").length;
+        const highRiskPorts = dashboard.high_port_count ?? 
+          portAnalysis.filter(p => p.risk === "HIGH" || p.risk_level === "HIGH").length;
+        const mediumPorts = dashboard.medium_port_count ?? 
+          portAnalysis.filter(p => p.risk === "MEDIUM" || p.risk_level === "MEDIUM").length;
+        
         return {
           title: "Port Scan Summary",
           stats: [
             { label: "Critical Ports", value: criticalPorts, color: "#ff4444" },
             { label: "High Risk Ports", value: highRiskPorts, color: "#ff9800" },
+            { label: "Medium Risk", value: mediumPorts, color: "#ffc107" },
           ],
         };
       case "honeypot":
