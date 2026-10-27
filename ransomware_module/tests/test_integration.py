@@ -10,18 +10,14 @@ import pandas as pd
 from honeypot.decoy_generator import DecoyGenerator
 from honeypot.scoring import evaluate, normalize
 
-# note: import of the ML prediction module is deferred inside fixtures
-# to avoid crashing the entire test suite when TensorFlow cannot be
-# initialized.  See load_detector() handling.
-from models.predict_lstm import load_detector, predict_dataframe, load_threshold
-
-
 @pytest.fixture(scope="module")
 def model_scaler():
+    predict_lstm = pytest.importorskip("models.predict_lstm")
     try:
-        return load_detector()
+        model, scaler = predict_lstm.load_detector()
     except Exception as e:
         pytest.skip(f"could not load LSTM detector: {e}")
+    return model, scaler, predict_lstm
 
 
 def score_record(modified, entropy_delta, renamed, write_rate, total):
@@ -43,8 +39,8 @@ def simulate_honeypot_activity(decoy_count, mode="normal"):
 
 
 def test_hybrid_scenarios(model_scaler):
-    model, scaler = model_scaler
-    thr = load_threshold()
+    model, scaler, predict_lstm = model_scaler
+    thr = predict_lstm.load_threshold()
     decoys = 5
 
     for case, expected in [
@@ -63,7 +59,7 @@ def test_hybrid_scenarios(model_scaler):
             "mem_write_ratio": rate,
         }
         df = pd.DataFrame([row])
-        probs, preds, _ = predict_dataframe(df, model, scaler, threshold=thr)
+        probs, preds, _ = predict_lstm.predict_dataframe(df, model, scaler, threshold=thr)
 
         ml_flag = bool(preds[0])
         expected_hp, expected_ml = expected
