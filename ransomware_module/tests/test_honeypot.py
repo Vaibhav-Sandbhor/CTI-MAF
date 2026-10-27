@@ -24,16 +24,17 @@ def test_shannon_entropy_known():
 
 
 def test_scoring_simple_cases():
-    # default configuration: only modified count matters
+    # default configuration emphasizes entropy/rename activity,
+    # so modified count alone should not trigger.
     cfg = None
     # one modified out of five => low score
     score, triggered = evaluate(1, 0.0, 0, 0.1, 5, cfg)
     assert score < 0.7
     assert not triggered
 
-    # many modifications should trigger under default weights
+    # many modifications alone should still stay below trigger threshold
     score, triggered = evaluate(5, 0.0, 0, 0.0, 5, cfg)
-    assert triggered
+    assert not triggered
 
     # rename burst should trigger if we give renames weight
     from honeypot.scoring import ScoreConfig

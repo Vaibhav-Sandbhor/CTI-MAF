@@ -20,18 +20,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run unit tests
+        working-directory: ransomware_module
         run: |
           pip install pytest
           python -m pytest tests -q
       - name: Build dataset (small pass)
+        working-directory: ransomware_module
         run: |
           python scripts/build_dataset.py --window 50 --step 50 --column 2
       - name: Train model short
+        working-directory: ransomware_module
         run: |
           python scripts/train_model.py --epochs 1 --batch 64 --seed 0
       - name: Run LOFO evaluation
+        working-directory: ransomware_module
         run: |
           python scripts/comprehensive_family_evaluation.py
       - name: Ensemble smoke
+        working-directory: ransomware_module
         run: |
           python scripts/train_ensemble.py --epochs 1 --batch 128 --seed 0
