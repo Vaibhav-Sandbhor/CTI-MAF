@@ -88,11 +88,17 @@ export const changePassword = async (currentPassword, newPassword) => {
 };
 
 export const fetchAlerts = async () => {
-  return fetch("/api/alerts").then(res => res.json());
+  const response = await fetch(`${API_BASE}/api/alerts`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
 };
 
 export const fetchDashboardStats = async () => {
-  return fetch("/api/dashboard").then(res => res.json());
+  const response = await fetch(`${API_BASE}/api/dashboard`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
 };
 
 export const scanRansomware = async (samplePath) => {
@@ -212,33 +218,52 @@ export const getHoneypotScanStatus = async () => {
 };
 
 // ---------------------------------------------------------------------------
-// Port Scan API
+// Port Scan API (via main backend - no separate service needed)
 // ---------------------------------------------------------------------------
 
-const PORTSCAN_BASE = import.meta.env.VITE_PORTSCAN_API_BASE || "http://127.0.0.1:8001";
+/**
+ * Check Nmap installation status (no auth required)
+ */
+export const checkNmapStatus = async () => {
+  const response = await fetch(`${API_BASE}/api/portscan/status`);
+  if (!response.ok) throw new Error(`Status check failed: ${response.status}`);
+  return response.json();
+};
 
+/**
+ * Scan localhost ports using the main API backend.
+ * This uses the integrated Nmap scanner in api_server.py
+ */
 export const scanSystemPorts = async () => {
-  const response = await fetch(`${PORTSCAN_BASE}/scan/target`, {
+  const response = await fetch(`${API_BASE}/api/portscan/scan`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ target: "127.0.0.1" }),
+    headers: getAuthHeaders(),
   });
-  if (!response.ok) throw new Error(`Server returned ${response.status}`);
+  if (!response.ok) throw new Error(`Port scan failed: ${response.status}`);
   return response.json();
 };
 
-export const startPortScan = async (target) => {
-  const response = await fetch(`${PORTSCAN_BASE}/scan/target`, {
+/**
+ * Start a port scan on a specific target.
+ * Falls back to localhost scan via main API.
+ */
+export const startPortScan = async (target = "127.0.0.1") => {
+  // Use the main backend's port scan endpoint
+  const response = await fetch(`${API_BASE}/api/portscan/scan`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ target }),
+    headers: getAuthHeaders(),
   });
+  if (!response.ok) throw new Error(`Port scan failed: ${response.status}`);
   return response.json();
 };
 
+/**
+ * Fetch port scan report (placeholder - data comes from scanSystemPorts)
+ */
 export const fetchPortScanReport = async (scanId) => {
-  const response = await fetch(`${PORTSCAN_BASE}/report/${scanId}`);
-  return response.json();
+  // Port scan results are returned directly from scanSystemPorts
+  // This is a no-op placeholder for compatibility
+  return { status: "use scanSystemPorts instead" };
 };
 
 // ---------------------------------------------------------------------------

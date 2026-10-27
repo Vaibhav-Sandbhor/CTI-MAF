@@ -1,0 +1,158 @@
+# 🔐 AI Port Scan Analyzer - Git Ignore Rules
+
+# ========== PYTHON ==========
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+.conda/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ========== ML / DATA ==========
+# Model files (can be large)
+model/*.pkl
+model/*.joblib
+model/*.h5
+model/*.pt
+model/*.pth
+
+# Large data files
+data/*.csv
+!data/sample_dataset.csv
+*.parquet
+*.hdf5
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Nmap scans (might contain sensitive data)
+nmap_scans/*.xml
+!nmap_scans/sample_scan.xml
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# ========== ENVIRONMENT & SECRETS ==========
+.env
+.env.local
+.env.*.local
+secrets/
+*.key
+*.pem
+credentials.json
+
+# ========== OS ==========
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+
+# ========== EDITOR BACKUPS ==========
+*.bak
+*.backup
+*~
+*.swp
+
+# ========== JUPYTER NOTEBOOKS ==========
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# ========== MISC ==========
+# Output files from scripts
+output.txt
+output.csv
+results/
+reports/
+
+# CI/CD
+.github/workflows/*.log
+
+# Keep tracking for documentation
+!README.md
+!QUICK_REFERENCE.md
+!API_BACKEND_RESTRUCTURING.md
+!IMPLEMENTATION_VERIFICATION.md
+!requirements.txt
+!requirements_api.txt
+
+# ========== ALLOW IMPORTANT FILES ==========
+# Always track these (remove the leading ! if you want to ignore them)
+!model/.gitkeep
+!logs/.gitkeep
+!nmap_scans/.gitkeep

@@ -1,0 +1,10 @@
+{
+  "learning_rate": [0.0005],
+  "dropout": [0.3],
+  "batch_size": [256],
+  "seq": [5],
+  "pos_weight": [3.0],
+  "loss": ["binary_crossentropy","focal"],
+  "gamma": [2.0],
+  "units": [[64, 32]]
+}

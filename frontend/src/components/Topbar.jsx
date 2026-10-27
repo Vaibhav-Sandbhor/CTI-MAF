@@ -14,12 +14,12 @@ function Topbar({ viewMode, onSwitchToLive }) {
     <header className="topbar">
       {/* LEFT BRAND */}
       <div className="topbar-left">
-        <span className="brand-icon">🛡️</span>
-        <span className="brand-name">CTI-MAF-WATCH</span>
+        <img src="/icons/icon.png" alt="SentraX" className="topbar-logo-img" />
+        <span className="brand-name">SentraX</span>
         {viewMode === "history" && (
           <span className="mode-badge history-mode">
             📜 HISTORY MODE
-            <button 
+            <button
               className="btn-exit-history"
               onClick={onSwitchToLive}
               title="Return to live dashboard"

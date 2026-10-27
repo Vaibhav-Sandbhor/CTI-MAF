@@ -196,6 +196,41 @@ function Profile() {
 
   return (
     <div className="profile-container">
+      {/* Back to Dashboard Button */}
+      <button 
+        className="back-to-dashboard-btn"
+        onClick={() => navigate("/", { replace: true })}
+        style={{
+          position: "absolute",
+          top: "20px",
+          left: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "10px 18px",
+          background: "linear-gradient(135deg, #2a2a4a 0%, #1a1a2e 100%)",
+          border: "1px solid #3a3a5a",
+          borderRadius: "8px",
+          color: "#7c83fd",
+          fontSize: "14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          zIndex: 10,
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, #3a3a5a 0%, #2a2a4a 100%)";
+          e.target.style.borderColor = "#7c83fd";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "linear-gradient(135deg, #2a2a4a 0%, #1a1a2e 100%)";
+          e.target.style.borderColor = "#3a3a5a";
+        }}
+      >
+        <span style={{ fontSize: "16px" }}>←</span>
+        Back to Dashboard
+      </button>
+
       {/* Header Section */}
       <div className="profile-header">
         <div className="profile-avatar">

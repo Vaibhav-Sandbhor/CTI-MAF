@@ -1,0 +1,199 @@
+{
+  "timestamp": "2026-02-21T19:40:46.632836",
+  "lofo_results": [
+    {
+      "held_out_family": "conti",
+      "train_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9976619290106858,
+      "precision": 0.9960402819438345,
+      "recall": 0.9958920318814047,
+      "f1": 0.9959661513958455,
+      "confusion_matrix": [
+        [
+          6642,
+          532
+        ],
+        [
+          552,
+          133821
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "lockbit",
+      "train_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9971513576529186,
+      "precision": 0.9941455781578805,
+      "recall": 0.9911240216251109,
+      "f1": 0.9926325005050846,
+      "confusion_matrix": [
+        [
+          6740,
+          434
+        ],
+        [
+          660,
+          73698
+        ]
+      ],
+      "optimal_threshold": 0.1
+    },
+    {
+      "held_out_family": "revil",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9969427008107978,
+      "precision": 0.9859645245068244,
+      "recall": 0.9793622042922224,
+      "f1": 0.9826522744795683,
+      "confusion_matrix": [
+        [
+          6920,
+          254
+        ],
+        [
+          376,
+          17843
+        ]
+      ],
+      "optimal_threshold": 0.47
+    },
+    {
+      "held_out_family": "ryuk",
+      "train_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.9944275749252692,
+      "precision": 0.955588380108321,
+      "recall": 0.9797072185764766,
+      "f1": 0.9674975074775674,
+      "confusion_matrix": [
+        [
+          6723,
+          451
+        ],
+        [
+          201,
+          9704
+        ]
+      ],
+      "optimal_threshold": 0.2
+    }
+  ],
+  "single_family_results": [
+    {
+      "train_family": "conti",
+      "test_families": [
+        "lockbit",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.9966217222271238,
+      "precision": 0.9945525139610167,
+      "recall": 0.992194512742458,
+      "f1": 0.9933721140367586,
+      "confusion_matrix": [
+        [
+          6617,
+          557
+        ],
+        [
+          800,
+          101692
+        ]
+      ]
+    },
+    {
+      "train_family": "lockbit",
+      "test_families": [
+        "conti",
+        "revil",
+        "ryuk"
+      ],
+      "roc_auc": 0.992888025690314,
+      "precision": 0.9977581440455424,
+      "recall": 0.9749795393429206,
+      "f1": 0.9862373328685606,
+      "confusion_matrix": [
+        [
+          6818,
+          356
+        ],
+        [
+          4066,
+          158441
+        ]
+      ]
+    },
+    {
+      "train_family": "revil",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "ryuk"
+      ],
+      "roc_auc": 0.9855572894827856,
+      "precision": 0.9966994023628845,
+      "recall": 0.955732096631084,
+      "f1": 0.9757859469303417,
+      "confusion_matrix": [
+        [
+          6482,
+          692
+        ],
+        [
+          9679,
+          208967
+        ]
+      ]
+    },
+    {
+      "train_family": "ryuk",
+      "test_families": [
+        "conti",
+        "lockbit",
+        "revil"
+      ],
+      "roc_auc": 0.973058261845467,
+      "precision": 0.9958138343693976,
+      "recall": 0.9422629538244625,
+      "f1": 0.9682985635534225,
+      "confusion_matrix": [
+        [
+          6275,
+          899
+        ],
+        [
+          13104,
+          213856
+        ]
+      ]
+    }
+  ],
+  "stability_metrics": {
+    "roc_auc_mean": 0.9965458905999178,
+    "roc_auc_std": 0.0012506849850681468,
+    "roc_auc_cv": 0.12550199613138116,
+    "recall_mean": 0.9865213690938037,
+    "recall_std": 0.0071881850861651685,
+    "recall_cv": 0.7286395724775909,
+    "f1_mean": 0.9846871084645165,
+    "f1_std": 0.011067621645614622,
+    "f1_cv": 1.1239734480603742
+  },
+  "feature_importance": []
+}

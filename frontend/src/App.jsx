@@ -28,7 +28,12 @@ import {
 
 function AppContent() {
   const { isAuthenticated, loading, registerDashboardStateGetter, registerDashboardStateResetter, sessionId } = useAuth();
-  
+
+  // ✅ Set document title to ensure consistent branding
+  useEffect(() => {
+    document.title = "SentraX";
+  }, []);
+
   // Initial empty state for dashboard
   const initialModuleData = {
     ransomware: {
@@ -509,6 +514,7 @@ function AppContent() {
 
                     <main className="dashboard-main">
                       <Routes>
+                        {/* Main Dashboard - accessible at / or /dashboard */}
                         <Route
                           path="/"
                           element={
@@ -527,6 +533,8 @@ function AppContent() {
                             </ProtectedRoute>
                           }
                         />
+                        {/* Redirect /dashboard to / for compatibility */}
+                        <Route path="/dashboard" element={<Navigate to="/" replace />} />
                 <Route
                   path="/details/portscan"
                   element={

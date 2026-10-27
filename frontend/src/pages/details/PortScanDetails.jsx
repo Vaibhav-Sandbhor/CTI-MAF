@@ -196,16 +196,16 @@ export default function PortScanDetails({ moduleState, updateModuleState }) {
     
     setDeepReporting(true);
     try {
-      const target = scanData.dashboard[0].host;
-      const response = await fetch("http://127.0.0.1:8001/deep-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target }),
+      // Deep report feature not yet implemented in unified backend
+      // For now, generate a summary from existing scan data
+      const dash = scanData.dashboard[0];
+      setDeepReport({
+        summary: `Security scan of ${dash.host} found ${dash.total_ports} open ports.`,
+        risk_assessment: `Overall risk level: ${dash.risk_tier}`,
+        recommendations: dash.high_port_count > 0 
+          ? "Close unnecessary high-risk ports and review firewall rules."
+          : "System appears secure. Continue monitoring.",
       });
-      
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      setDeepReport(data.deep_report || null);
     } catch (e) {
       setError(`Failed to generate deep report: ${e.message}`);
     }
@@ -272,7 +272,7 @@ Generated: ${new Date().toLocaleString()}
         });
       }
     } catch (e) {
-      setError(`Cannot reach AI Port Scanner at http://127.0.0.1:8001. Is it running? (${e.message})`);
+      setError(`Port scan failed: ${e.message}. Is the backend running?`);
       setStatus("error");
     }
 
@@ -484,7 +484,7 @@ Generated: ${new Date().toLocaleString()}
           {allOpenPortRows.length > 0 && (
             <div style={{
               background: "#12121e", border: "1px solid #2a2a3a",
-              borderRadius: 10, overflow: "hidden", marginBottom: 20,
+              borderRadius: 10, marginBottom: 20,
             }}>
               <div style={{
                 padding: "14px 20px", borderBottom: "1px solid #2a2a3a",
@@ -496,12 +496,17 @@ Generated: ${new Date().toLocaleString()}
                 </span>
               </div>
 
-              <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: 420 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, tableLayout: "fixed" }}>
-                  <thead>
+              {/* Scrollable table wrapper with fixed height */}
+              <div className="port-table-scroll">
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead style={{ 
+                    position: "sticky", 
+                    top: 0, 
+                    zIndex: 10,
+                  }}>
                     <tr style={{ background: "#1a1a2e", color: "#888" }}>
                       {["Risk", "Port", "Service", "Risk Level", "CVSS", "Exploitability", "Priority"].map(h => (
-                        <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap" }}>
+                        <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontWeight: 600, whiteSpace: "nowrap", background: "#1a1a2e" }}>
                           {h}
                         </th>
                       ))}

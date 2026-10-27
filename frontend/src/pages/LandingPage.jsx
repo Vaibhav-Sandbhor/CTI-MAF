@@ -8,8 +8,8 @@ function LandingPage() {
       {/* Top Navbar */}
       <nav className="landing-nav">
         <div className="landing-nav-left">
-          <span className="landing-logo">🛡️</span>
-          <span className="landing-brand">CTIMAF</span>
+          <img src="/icons/icon.png" alt="SentraX" className="landing-logo-img" />
+          <span className="landing-brand">SentraX</span>
         </div>
         <div className="landing-nav-right">
           <Link to="/login" className="nav-btn nav-btn-login">
@@ -24,13 +24,15 @@ function LandingPage() {
       {/* Hero Section */}
       <main className="landing-hero">
         <div className="hero-content">
-          <h1 className="hero-title">CTIMAF</h1>
+          <div className="hero-logo-container">
+            <img src="/icons/icon.png" alt="SentraX" className="hero-logo" />
+          </div>
+          <h1 className="hero-title">SentraX</h1>
           <p className="hero-subtitle">
-            Cyber Threat Intelligence Monitoring & Analysis Framework
+            Cyber Threat Intelligence Using Multi-Agent FrameWork
           </p>
           <p className="hero-description">
-            A comprehensive Security Operations Center (SOC) platform powered by 
-            AI-driven threat detection, real-time monitoring, and advanced analytics.
+            AI-powered multi-agent system for real-time ransomware detection, port scanning analysis, and honeypot-based threat intelligence.
           </p>
 
           <div className="hero-cta">
@@ -49,7 +51,7 @@ function LandingPage() {
             <div className="feature-icon">🔒</div>
             <h3 className="feature-title">AI Ransomware Detection</h3>
             <p className="feature-desc">
-              Machine learning-powered ransomware detection using behavioral analysis 
+              LSTM-based ransomware detection using behavioral analysis
               and real-time process monitoring.
             </p>
           </div>
@@ -58,7 +60,7 @@ function LandingPage() {
             <div className="feature-icon">🌐</div>
             <h3 className="feature-title">Port Scan Monitoring</h3>
             <p className="feature-desc">
-              Continuous network surveillance with CVSS-based risk scoring and 
+              Continuous network surveillance with CVSS-based risk scoring and
               vulnerability prioritization.
             </p>
           </div>
@@ -67,7 +69,7 @@ function LandingPage() {
             <div className="feature-icon">🍯</div>
             <h3 className="feature-title">Honeypot System</h3>
             <p className="feature-desc">
-              Decoy file monitoring to detect and analyze malicious file access 
+              Decoy file monitoring to detect and analyze malicious file access
               patterns and intrusion attempts.
             </p>
           </div>
@@ -76,7 +78,7 @@ function LandingPage() {
 
       {/* Footer */}
       <footer className="landing-footer">
-        <p>© 2026 CTIMAF - Cyber Threat Intelligence Monitoring & Analysis Framework</p>
+        <p>© 2026 SentraX - Real-Time Cyber Threat Intelligence</p>
       </footer>
     </div>
   );
